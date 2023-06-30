@@ -1,6 +1,9 @@
 import 'dart:math' as math;
 import 'package:arkit_plugin/arkit_plugin.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 import 'package:collection/collection.dart';
 
@@ -15,25 +18,106 @@ class _DistanceTrackingPageState extends State<DistanceTrackingPage> {
   ARKitNode? node;
   String? anchorId;
   vector.Vector3? lastPosition;
+var snackMessage = const SnackBar(content:  Text('yay'));
+
+@override
+void initState(){
+  
+  super.initState();
+
+  SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      ]);
+     WidgetsBinding.instance.addPostFrameCallback((_){
+
+ customAlertDialog();
+
+});
+
+
+}
+
+
+@override
+dispose(){
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+  arkitController.dispose();
+  super.dispose();
+}
+
+
 
   @override
-  void dispose() {
-    arkitController.dispose();
-    super.dispose();
-  }
+  Widget build(BuildContext context) {
 
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Distance Tracking Sample')),
-        body: Container(
-          child: ARKitSceneView(
+    var size = MediaQuery.of(context).size;
+    return  Scaffold(
+        body: Stack(
+          children: [
+            ARKitSceneView(
             showFeaturePoints: true,
-            planeDetection: ARPlaneDetection.horizontal,
+            planeDetection: ARPlaneDetection.vertical,
+            //TODO screen must open in vertical by default
             onARKitViewCreated: onARKitViewCreated,
             enableTapRecognizer: true,
           ),
+          Positioned(
+            top: size.width * 0.01,
+            left: size.width * 0.03,
+            child: MaterialButton(
+              color: const  Color(0xFF018786),
+              onPressed: ()=> Navigator.pop(context),
+              child: const Icon(Icons.arrow_back_ios, color: Colors.white, size: 30,),
+            ),
+          ),
+          Positioned(
+           top: size.height * 0.63,
+           bottom: size.height * 0.1,
+           left:size.height * 0.75,
+           right: size.height * 0.75,
+
+            child: Container(
+              height: size.height * 0.7,
+            decoration:  BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(20)),
+              border: Border.all(width: 5, color:const  Color(0xFF018786)),
+
+              // color: Colors.red,
+            ),
+           child:const Center(child: Text('Card read function', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),),),
+          ),),
+     
+          ],
         ),
       );
+  }
+
+
+
+ customAlertDialog(){
+  return showDialog(context: context, builder: (_){
+    return CupertinoAlertDialog(
+    title: const Text('카메라 경고'),
+    content: const Text('물체를 측정하기 위해 전화기를 똑바로 유지하십시오.'),
+    actions: [
+      CupertinoDialogAction(child:  TextButton(
+        onPressed: ()=> Navigator.pop(context),
+        child: const Text('OK'),
+      ))
+    ],
+  );
+  });
+}
+
+
+
+
 
   void onARKitViewCreated(ARKitController arkitController) {
     this.arkitController = arkitController;
@@ -96,7 +180,7 @@ class _DistanceTrackingPageState extends State<DistanceTrackingPage> {
     );
     final material = ARKitMaterial(
       lightingModelName: ARKitLightingModel.constant,
-      diffuse: ARKitMaterialProperty.color(Color.fromRGBO(255, 153, 83, 1)),
+      diffuse: ARKitMaterialProperty.color(const Color.fromRGBO(255, 153, 83, 1)),
     );
     final sphere = ARKitSphere(
       radius: 0.003,
@@ -124,7 +208,7 @@ class _DistanceTrackingPageState extends State<DistanceTrackingPage> {
 
   String _calculateDistanceBetweenPoints(vector.Vector3 A, vector.Vector3 B) {
     final length = A.distanceTo(B);
-    return '${(length * 100).toStringAsFixed(2)} cm';
+    return '${(length * 100).toStringAsFixed(2)} 센티미터';
   }
 
   vector.Vector3 _getMiddleVector(vector.Vector3 A, vector.Vector3 B) {
