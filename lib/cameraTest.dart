@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 import 'package:arkit_plugin/arkit_plugin.dart';
+import 'package:cameratest/savedImage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:vector_math/vector_math_64.dart' as vector;
 import 'package:collection/collection.dart';
@@ -95,8 +95,31 @@ dispose(){
      
           ],
         ),
+         floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.camera_alt, color: Color(0xFF018786),),
+        onPressed: () async {
+          try {
+            final image = await arkitController.snapshot();
+            // ignore: use_build_context_synchronously
+            await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SnapshotPreview(
+                  imageProvider: image,
+                ),
+              ),
+            );
+          } catch (e) {
+            print(e);
+          }
+        },
+      ),
       );
   }
+
+
+
+
 
 
 
@@ -106,10 +129,9 @@ dispose(){
     title: const Text('카메라 경고'),
     content: const Text('물체를 측정하기 위해 전화기를 똑바로 유지하십시오.'),
     actions: [
-      CupertinoDialogAction(child:  TextButton(
-        onPressed: ()=> Navigator.pop(context),
-        child: const Text('OK'),
-      ))
+      GestureDetector(
+        onTap: ()=> Navigator.pop(context),
+        child: const CupertinoDialogAction(child:  const Text('OK')))
     ],
   );
   });
@@ -180,7 +202,8 @@ dispose(){
     );
     final material = ARKitMaterial(
       lightingModelName: ARKitLightingModel.constant,
-      diffuse: ARKitMaterialProperty.color(const Color.fromRGBO(255, 153, 83, 1)),
+      // diffuse: ARKitMaterialProperty.color(const Color.fromRGBO(255, 153, 83, 1)),
+      diffuse: ARKitMaterialProperty.color(const Color(0xFFE91E63)),
     );
     final sphere = ARKitSphere(
       radius: 0.003,
@@ -249,3 +272,6 @@ dispose(){
     arkitController.add(node);
   }
 }
+
+
+

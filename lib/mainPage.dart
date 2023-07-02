@@ -14,25 +14,16 @@ class MyApp extends StatelessWidget {
         centerTitle: true,
       ),
       body: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        child: MaterialButton(onPressed:   (){
+          Navigator.push(context, MaterialPageRoute(builder: (context)=> DistanceTrackingPage()));
+        },
+        child:  const Center(child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            MaterialButton(onPressed:   (){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> DistanceTrackingPage()));
-            },
-            child:  Container(
-              height: 50,
-              width: 100,
-              color: Colors.blue,
-              child: const Row(
-                children: [
-                  Center(child: Text('Test the Camera'))
-                ],
-              ),
-            ),),
+            Icon(Icons.camera_alt),
+            Text('Test the Camera'),
           ],
-        ),
+        )),),
       ),
     );
   }
